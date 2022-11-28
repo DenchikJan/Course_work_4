@@ -1,4 +1,5 @@
 from app.dao.models.genres import Genres
+from constants import records_on_one_page
 
 
 class GenreDAO:
@@ -11,8 +12,13 @@ class GenreDAO:
 
         return genre
 
-    def get_all(self):
-        genres = self.session.query(Genres).all()
+    def get_all(self, data):
+        if data.get('page') is not None:
+            page = int(data.get('page'))
+            offset_ = records_on_one_page * (page - 1)
+            genres = self.session.query(Genres).limit(records_on_one_page).offset(offset_)
+        else:
+            genres = self.session.query(Genres).all()
 
         return genres
 
@@ -24,11 +30,12 @@ class GenreDAO:
 
         return new_genre
 
-    def update(self, genre):
+    def update(self, data):
+        genre = self.get_one(data.get("id"))
+        genre.name = data.get("name")
+
         self.session.add(genre)
         self.session.commit()
-
-        return genre
 
     def delete(self, gid):
         genre = self.get_one(gid)

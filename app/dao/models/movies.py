@@ -17,6 +17,7 @@ class Movies(db.Model):
 
     genre = relationship('Genres', back_populates='movie')
     director = relationship('Directors', back_populates='movie')
+    favorites_movies = relationship('FavoritesMovies', back_populates='movie')
 
 
 class MovieSchema(Schema):

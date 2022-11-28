@@ -1,4 +1,5 @@
 from app.dao.models.directors import Directors
+from constants import records_on_one_page
 
 
 class DirectorDAO:
@@ -11,8 +12,13 @@ class DirectorDAO:
 
         return director
 
-    def get_all(self):
-        directors = self.session.query(Directors).all()
+    def get_all(self, data):
+        if data.get('page') is not None:
+            page = int(data.get('page'))
+            offset_ = records_on_one_page * (page - 1)
+            directors = self.session.query(Directors).limit(records_on_one_page).offset(offset_)
+        else:
+            directors = self.session.query(Directors).all()
 
         return directors
 
@@ -24,14 +30,16 @@ class DirectorDAO:
 
         return new_directors
 
-    def update(self, director):
+    def update(self, data):
+        director = self.get_one(data.get("id"))
+        director.name = data.get("name")
+
         self.session.add(director)
         self.session.commit()
 
-        return director
-
     def delete(self, did):
-        genre = self.get_one(did)
+        director = self.get_one(did)
 
-        self.session.delete(genre)
+        self.session.delete(director)
         self.session.commit()
+

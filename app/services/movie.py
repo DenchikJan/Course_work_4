@@ -8,25 +8,21 @@ class MovieService:
     def get_one(self, mid):
         return self.dao.get_one(mid)
 
-    def get_all(self):
-        return self.dao.get_all()
-
-    def get_year(self, year):
-        return self.dao.get_year(year)
-
-    def get_director(self, director_id):
-        return self.dao.get_director(director_id)
-
-    def get_genre(self, genre_id):
-        return self.dao.get_genre(genre_id)
+    def get_all(self, data):
+        if data.get('year') is not None:
+            return self.dao.get_year(data)
+        elif data.get('director_id') is not None:
+            return self.dao.get_director(data)
+        elif data.get('genre_id') is not None:
+            return self.dao.get_genre(data)
+        else:
+            return self.dao.get_all(data)
 
     def create(self, data):
         return self.dao.create(data)
 
     def update(self, data):
-        mid = data.get('id')
-        movie = self.get_one(mid)
-
+        movie = self.get_one(data.get("id"))
         movie.title = data.get('title')
         movie.description = data.get('description')
         movie.trailer = data.get('trailer')
@@ -35,11 +31,10 @@ class MovieService:
         movie.genre_id = data.get('genre_id')
         movie.director_id = data.get('director_id')
 
-        self.dao.update(movie)
+        return self.dao.update(movie)
 
     def update_partial(self, data):
-        mid = data.get('id')
-        movie = self.get_one(mid)
+        movie = self.get_one(data['id'])
 
         if 'title' in data:
             movie.title = data.get('title')

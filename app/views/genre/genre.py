@@ -14,7 +14,10 @@ genres_schema = GenreSchema(many=True)
 @genre_ns.route('/')
 class GenresView(Resource):
     def get(self):
-        genres = genre_service.get_all()
+        data = {
+            "page": request.args.get('page')
+        }
+        genres = genre_service.get_all(data)
         return genres_schema.dump(genres), 200
 
     def post(self):

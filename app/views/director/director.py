@@ -1,7 +1,7 @@
 from flask import request
 from flask_restx import Resource, Namespace
 
-from app.dao.models.directors import DirectorSchema, Directors
+from app.dao.models.directors import DirectorSchema
 from app.container import director_service
 
 
@@ -14,7 +14,10 @@ directors_schema = DirectorSchema(many=True)
 @director_ns.route('/')
 class DirectorsView(Resource):
     def get(self):
-        directors = director_service.get_all()
+        data = {
+            "page": request.args.get('page')
+        }
+        directors = director_service.get_all(data)
 
         return directors_schema.dump(directors), 201
 

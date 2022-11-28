@@ -2,8 +2,7 @@ from flask import request
 from flask_restx import Resource, Namespace
 
 from app.container import movie_service
-from app.dao.models.movies import MovieSchema, Movies
-from app.database import db
+from app.dao.models.movies import MovieSchema
 
 
 movie_ns = Namespace('movies')
@@ -15,29 +14,17 @@ movies_schema = MovieSchema(many=True)
 @movie_ns.route('/')
 class MoviesView(Resource):
     def get(self):
-        if request.args.get('year'):
-            year = request.args.get('year')
-            director_movies = movie_service.get_year(year)
+        data = {
+            "year": request.args.get('year'),
+            "director_id": request.args.get('director_id'),
+            "genre_id": request.args.get('genre_id'),
+            "page": request.args.get('page'),
+            "status": request.args.get('status')
+        }
+        movies = movie_service.get_all(data)
+        response = movies_schema.dump(movies)
 
-            return movies_schema.dump(director_movies), 201
-
-        elif request.args.get('director_id'):
-            director_id = request.args.get('director_id')
-            director_movies = movie_service.get_director(director_id)
-
-            return movies_schema.dump(director_movies), 201
-
-        elif request.args.get('genre_id'):
-            genre_id = request.args.get('genre_id')
-            director_movies = movie_service.get_genre(genre_id)
-
-            return movies_schema.dump(director_movies), 201
-
-        else:
-            movies = movie_service.get_all()
-            response = movies_schema.dump(movies)
-
-            return response, 200
+        return response
 
     def post(self):
         req_json = request.json
